@@ -1,0 +1,37 @@
+name: Build Windows CE Project
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Install .NET Framework
+      run: |
+        choco install netfx-4.8-devpack
+        choco install mono
+
+    - name: Restore NuGet packages
+      run: nuget restore Coletor.sln
+
+    - name: Build the solution
+      run: msbuild Coletor.sln /p:Configuration=Release
+
+    - name: Publish artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: WindowsCEApp
+        path: path/to/your/output/directory
